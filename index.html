@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRMNL Shipping Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #222;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4a4a4a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 30px auto;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #333;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            border-left: 4px solid #4a4a4a;
+            display: none;
+        }
+        .error {
+            color: #d9534f;
+            margin-top: 10px;
+            display: none;
+        }
+        .logo {
+            text-align: center;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #4a4a4a;
+        }
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #777;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">TRMNL</div>
+        <h1>Shipping Calculator</h1>
+        
+        <div class="form-group">
+            <label for="orderNumber">Order Number:</label>
+            <input type="number" id="orderNumber" placeholder="Enter your order number" min="1">
+        </div>
+        
+        <div class="form-group">
+            <label for="deviceColor">Device Color:</label>
+            <select id="deviceColor">
+                <option value="white">White</option>
+                <option value="black">Black</option>
+                <option value="clear">Clear</option>
+            </select>
+        </div>
+        
+        <button onclick="calculateShipping()">Calculate Shipping</button>
+        
+        <div id="error" class="error">Please enter a valid order number.</div>
+        
+        <div id="result" class="result">
+            <p>Based on your order #<span id="displayOrderNum"></span> for a <span id="displayColor"></span> TRMNL device:</p>
+            <p>There are approximately <span id="ordersAhead" class="highlight"></span> orders ahead of yours.</p>
+            <p>Estimated shipping time: <span id="shippingDays" class="highlight"></span> business days.</p>
+            <p>(Based on processing approximately 150 orders per business day)</p>
+        </div>
+    </div>
+    
+    <footer>
+        This calculator provides an estimate only. Actual shipping times may vary.
+    </footer>
+
+    <script>
+        function calculateShipping() {
+            // Get values from form
+            const orderNumber = parseInt(document.getElementById('orderNumber').value);
+            const deviceColor = document.getElementById('deviceColor').value;
+            
+            // Validate input
+            if (isNaN(orderNumber) || orderNumber <= 0) {
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('result').style.display = 'none';
+                return;
+            }
+            
+            // Hide error message if previously shown
+            document.getElementById('error').style.display = 'none';
+            
+            // Calculate orders ahead based on algorithm
+            let baseNumber;
+            if (deviceColor === 'white') {
+                baseNumber = 3511;
+            } else if (deviceColor === 'black') {
+                baseNumber = 5050;
+            } else { // clear
+                baseNumber = 8897;
+            }
+            
+            // Calculate orders ahead
+            let difference = orderNumber - baseNumber;
+            if (difference < 0) {
+                difference = 0; // Edge case for very early orders
+            }
+            
+            const ordersAhead = Math.round(difference - (difference * 0.1));
+            
+            // Calculate business days
+            const businessDays = Math.ceil(ordersAhead / 150);
+            
+            // Display the results
+            document.getElementById('displayOrderNum').textContent = orderNumber;
+            document.getElementById('displayColor').textContent = deviceColor.charAt(0).toUpperCase() + deviceColor.slice(1);
+            document.getElementById('ordersAhead').textContent = ordersAhead;
+            document.getElementById('shippingDays').textContent = businessDays;
+            document.getElementById('result').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
